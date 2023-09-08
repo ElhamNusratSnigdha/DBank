@@ -1,113 +1,95 @@
-import Image from 'next/image'
+"use client"
+import { useEffect, useState } from "react"
+import {ethers} from "ethers"
+import abi from "./dbank.json";
+import Header from "./components/Header";
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+export default function page(){
+  const [address, setAddress] = useState(null);
+  const [balance, setBalance] = useState(0);
+  const [contract, setContract] = useState(null);
+  const [bankbalance, setBankbalance] = useState(0);
+  const [formdata, setFormdata] = useState({
+    depositamount: "",
+    withdrawamount: "",
+    transferaddress: "",
+    transferamount: "",
+  });
+  const contractaddress = "0x167caA634787E6a479fBB93838C76EB0Bd5A233E";
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+  useEffect(()=>{
+    async function initialize(){
+      if (typeof window.ethereum !== "undefined"){
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const address = await signer.getAddress();
+        setAddress(address);
+        const balance = await provider.getBalance(address);
+        setBalance(ethers.utils.formatEther(balance));
+        const contract = new ethers.Contract(contractaddress,abi, signer);
+        setContract(contract);
+      }
+    }
+    initialize();
+  },[])
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+  async function depositbro() {
+    const mycon = await contract?.deposit({value: formdata.depositamount});
+    console.log(mycon); 
+  }
+  async function withdrawbro() {
+    const mycon = await contract?.withdraw(formdata.withdrawamount);
+    console.log(mycon); 
+  }
+  async function transferbro() {
+    const mycon = await contract?.transferTo(formdata.transferaddress, formdata.transferamount);
+    console.log(mycon); 
+  }
+useEffect(()=>{
+  async function balancebro() {
+    console.log(contract);
+    const mycon = await contract?.getBalance();
+    console.log(mycon);
+    setBankbalance(mycon?.toString())
+    console.log(mycon); 
+  }
+  balancebro();
+  },[contract])
+  
+  function onchangevalue(e){
+     const {name, value} = e.target;
+     setFormdata((data) => ({...data, [name]:value})); 
+  }
+  return(
+    <>
+    <div>
+    <Header />
+    <p className="text-blue-400 text-md md:text-lg lg:text-3xl text-center pt-20 pb-5">Hi,<span className="text-blue-400">{address?.slice(0,10)}...{address?.slice(-10)}</span> </p>
+    <p className="text-green-400 text-md md:text-lg lg:text-3xl text-center pt-3 pb-3">My Bank Balance:<span >{bankbalance}</span> </p>
+    <div className="bg-red-400 flex mx-5 flex-col py-10 lg:py-24 lg:space-y-8 rounded-xl lg:mx-[700px] md:justify-center">
+    <p className="text-white text-center text-xl ">My deposit Section</p>
+    <div className="flex flex-col px-10 lg:px-48 space-y-2  justify-center space-x-4">
+    <input type="text" className="border border-black px-2" name="depositamount" value={formdata.depositamount} onChange={onchangevalue} />
+    <button className="text-white bg-green-400 rounded-lg px-4 py-2" onClick={depositbro} >Deposit Here</button>
+    </div>
+    </div>
+    <div className="bg-blue-400 flex mx-5 mt-5 flex-col py-10  lg:py-24 lg:space-y-8 rounded-xl lg:mx-[700px] lg:justify-center">
+    <p className="text-white text-center text-xl ">My Withdraw Section</p>
+    <div className="flex flex-col px-10  lg:px-48 space-y-2   justify-center space-x-4">
+    <input type="text" className="border border-black px-2" name="withdrawamount" value={formdata.withdrawamount} onChange={onchangevalue} />
+    <button className="text-white bg-green-400 rounded-lg px-4 py-2" onClick={withdrawbro} >Withdraw Here</button>
+    </div>
+    </div>
+    <div className="bg-green-400 mb-20 flex mx-5 mt-5 flex-col py-10  lg:py-24 lg:space-y-8 rounded-xl lg:mx-[700px] lg:justify-center">
+    <p className="text-white text-center text-xl ">My transfer Section</p>
+    <div className="flex flex-col lg:flex-row px-10  lg:px-0 space-y-2  lg:space-y-0 justify-center space-x-4">
+    <input type="text" className="border border-black px-2" name="transferaddress" placeholder="Transfer Address" value={formdata.transferaddress} onChange={onchangevalue} />
+    <input type="text" className="border border-black px-2" name="transferamount" placeholder="Transfer Amount" value={formdata.transferamount} onChange={onchangevalue} />
+    <button className="text-black bg-yellow-300 rounded-lg px-4 py-2" onClick={transferbro} >Transfer Here</button>
+    </div>
+    </div>
+    </div>
+    </>
   )
 }
